@@ -37,5 +37,5 @@ else
     $MONITORING_COMPOSE $CONSUMERS_COMPOSE pull && \
   sudo /usr/local/bin/docker-compose -p datahub \
     -f quickstart/docker-compose-without-neo4j.quickstart.yml \
-    $MONITORING_COMPOSE $CONSUMERS_COMPOSE up $@
+    $MONITORING_COMPOSE $CONSUMERS_COMPOSE up
 fi
