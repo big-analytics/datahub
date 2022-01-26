@@ -221,7 +221,7 @@ def quickstart(
     os.environ["DATAHUB_VERSION"] = version
 
     base_command: List[str] = [
-        "docker-compose",
+        "sudo /usr/local/bin/docker-compose",
         *itertools.chain.from_iterable(
             ("-f", f"{path}") for path in quickstart_compose_file
         ),

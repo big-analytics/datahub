@@ -25,17 +25,17 @@ DEFAULT_VERSION=$(echo $TAG_VERSION | sed 's/undefined/head/')
 export DATAHUB_VERSION=${DATAHUB_VERSION:-${DEFAULT_VERSION}}
 
 echo "Quickstarting DataHub: version ${DATAHUB_VERSION}"
-if docker volume ls | grep -c -q datahub_neo4jdata
+if sudo docker volume ls | grep -c -q datahub_neo4jdata
 then
   echo "Datahub Neo4j volume found, starting with neo4j as graph service"
-  cd $DIR && docker-compose pull && docker-compose -p datahub up
+  cd $DIR && sudo /usr/local/bin/docker-compose pull && sudo /usr/local/bin/docker-compose -p datahub up
 else
   echo "No Datahub Neo4j volume found, starting with elasticsearch as graph service"
   cd $DIR && \
-  docker-compose \
+  sudo /usr/local/bin/docker-compose \
     -f quickstart/docker-compose-without-neo4j.quickstart.yml \
     $MONITORING_COMPOSE $CONSUMERS_COMPOSE pull && \
-  docker-compose -p datahub \
+  sudo /usr/local/bin/docker-compose -p datahub \
     -f quickstart/docker-compose-without-neo4j.quickstart.yml \
     $MONITORING_COMPOSE $CONSUMERS_COMPOSE up $@
 fi

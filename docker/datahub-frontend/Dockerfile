@@ -1,7 +1,10 @@
 # Defining environment
 ARG APP_ENV=prod
+ENV HTTPS_PROXY="http://gateway.zscloud.net:443"
+ENV HTTP_PROXY="http://gateway.zscloud.net:80"
+ENV no_proxy="localhost,mnexus001,mnexus910,mdhprot601,mdhprot901,mgit001"
 
-FROM alpine:3.14 AS base
+FROM mnexus001:8082/alpine:3.14 AS base
 
 RUN addgroup -S datahub && adduser -S datahub -G datahub
 
@@ -24,7 +27,7 @@ RUN cd datahub-src && ./gradlew :datahub-frontend:dist -PenableEmber=${ENABLE_EM
     && cp datahub-frontend/build/distributions/datahub-frontend.zip ../datahub-frontend.zip \
     && cd .. && rm -rf datahub-src && unzip datahub-frontend.zip
 
-FROM base as prod-install
+FROM mnexus001:8082/base as prod-install
 COPY --from=prod-build /datahub-frontend /datahub-frontend/
 RUN chown -R datahub:datahub /datahub-frontend && chmod 755 /datahub-frontend
 
