@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import platform
+import sys
 import uuid
 from functools import wraps
 from pathlib import Path
@@ -23,6 +24,7 @@ CONFIG_FILE = DATAHUB_FOLDER / "telemetry-config.json"
 
 # also fall back to environment variable if config file is not found
 ENV_ENABLED = os.environ.get("DATAHUB_TELEMETRY_ENABLED", "true").lower() == "true"
+TIMEOUT = int(os.environ.get("DATAHUB_TELEMETRY_TIMEOUT", "10"))
 
 
 class Telemetry:
@@ -157,6 +159,7 @@ class Telemetry:
                 headers={
                     "user-agent": f"datahub {datahub_package.nice_version_name()}"
                 },
+                timeout=TIMEOUT,
             )
         except Exception as e:
 
@@ -168,11 +171,45 @@ telemetry_instance = Telemetry()
 T = TypeVar("T")
 
 
+def get_full_class_name(obj):
+    module = obj.__class__.__module__
+    if module is None or module == str.__class__.__module__:
+        return obj.__class__.__name__
+    return module + "." + obj.__class__.__name__
+
+
 def with_telemetry(func: Callable[..., T]) -> Callable[..., T]:
     @wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
-        res = func(*args, **kwargs)
-        telemetry_instance.ping(func.__module__, func.__name__)
-        return res
+
+        category = func.__module__
+        action = func.__name__
+
+        telemetry_instance.ping(category, action, "started")
+        try:
+            res = func(*args, **kwargs)
+            telemetry_instance.ping(category, action, "completed")
+            return res
+        # Catch general exceptions
+        except Exception as e:
+            telemetry_instance.ping(category, action, f"error:{get_full_class_name(e)}")
+            raise e
+        # System exits (used in ingestion and Docker commands) are not caught by the exception handler,
+        # so we need to catch them here.
+        except SystemExit as e:
+            # Forward successful exits
+            if e.code == 0:
+                telemetry_instance.ping(category, action, "completed")
+                sys.exit(0)
+            # Report failed exits
+            else:
+                telemetry_instance.ping(
+                    category, action, f"error:{get_full_class_name(e)}"
+                )
+                sys.exit(e.code)
+        # Catch SIGINTs
+        except KeyboardInterrupt:
+            telemetry_instance.ping(category, action, "cancelled")
+            sys.exit(0)
 
     return wrapper

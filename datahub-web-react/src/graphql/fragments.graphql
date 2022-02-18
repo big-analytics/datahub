@@ -13,6 +13,9 @@ fragment glossaryTerms on GlossaryTerms {
         term {
             urn
             name
+            properties {
+                name
+            }
         }
     }
 }
@@ -33,16 +36,18 @@ fragment ownershipFields on Ownership {
                     lastName
                     fullName
                 }
-                editableInfo {
+                editableProperties {
+                    displayName
+                    title
                     pictureLink
                 }
             }
-
             ... on CorpGroup {
                 urn
                 type
                 name
                 info {
+                    displayName
                     email
                     admins {
                         urn
@@ -91,6 +96,21 @@ fragment ownershipFields on Ownership {
     }
 }
 
+fragment institutionalMemoryFields on InstitutionalMemory {
+    elements {
+        url
+        author {
+            urn
+            username
+        }
+        description
+        created {
+            actor
+            time
+        }
+    }
+}
+
 fragment nonRecursiveDatasetFields on Dataset {
     urn
     name
@@ -116,18 +136,7 @@ fragment nonRecursiveDatasetFields on Dataset {
         ...ownershipFields
     }
     institutionalMemory {
-        elements {
-            url
-            author {
-                urn
-                username
-            }
-            description
-            created {
-                actor
-                time
-            }
-        }
+        ...institutionalMemoryFields
     }
     schemaMetadata(version: 0) {
         ...schemaMetadataFields
@@ -159,6 +168,12 @@ fragment nonRecursiveDatasetFields on Dataset {
     subTypes {
         typeNames
     }
+    domain {
+        ...entityDomain
+    }
+    container {
+        ...entityContainer
+    }
 }
 
 fragment nonRecursiveDataFlowFields on DataFlow {
@@ -186,6 +201,9 @@ fragment nonRecursiveDataFlowFields on DataFlow {
     platform {
         ...platformFields
     }
+    domain {
+        ...entityDomain
+    }
 }
 
 fragment nonRecursiveDataJobFields on DataJob {
@@ -201,6 +219,9 @@ fragment nonRecursiveDataJobFields on DataJob {
     }
     globalTags {
         ...globalTagsFields
+    }
+    domain {
+        ...entityDomain
     }
 }
 
@@ -241,21 +262,13 @@ fragment dataJobFields on DataJob {
         ...globalTagsFields
     }
     institutionalMemory {
-        elements {
-            url
-            author {
-                urn
-                username
-            }
-            label
-            created {
-                time
-                actor
-            }
-        }
+        ...institutionalMemoryFields
     }
     glossaryTerms {
         ...glossaryTerms
+    }
+    domain {
+        ...entityDomain
     }
 }
 
@@ -288,24 +301,19 @@ fragment dashboardFields on Dashboard {
         ...globalTagsFields
     }
     institutionalMemory {
-        elements {
-            url
-            author {
-                urn
-                username
-            }
-            label
-            created {
-                time
-                actor
-            }
-        }
+        ...institutionalMemoryFields
     }
     glossaryTerms {
         ...glossaryTerms
     }
     platform {
         ...platformFields
+    }
+    domain {
+        ...entityDomain
+    }
+    container {
+        ...entityContainer
     }
 }
 
@@ -339,18 +347,7 @@ fragment nonRecursiveMLFeature on MLFeature {
         ...ownershipFields
     }
     institutionalMemory {
-        elements {
-            url
-            author {
-                urn
-                username
-            }
-            description
-            created {
-                actor
-                time
-            }
-        }
+        ...institutionalMemoryFields
     }
     status {
         removed
@@ -387,18 +384,7 @@ fragment nonRecursiveMLPrimaryKey on MLPrimaryKey {
         ...ownershipFields
     }
     institutionalMemory {
-        elements {
-            url
-            author {
-                urn
-                username
-            }
-            description
-            created {
-                actor
-                time
-            }
-        }
+        ...institutionalMemoryFields
     }
     status {
         removed
@@ -426,18 +412,7 @@ fragment nonRecursiveMLFeatureTable on MLFeatureTable {
         ...ownershipFields
     }
     institutionalMemory {
-        elements {
-            url
-            author {
-                urn
-                username
-            }
-            description
-            created {
-                actor
-                time
-            }
-        }
+        ...institutionalMemoryFields
     }
     status {
         removed
@@ -604,5 +579,25 @@ fragment nonConflictingPlatformFields on DataPlatform {
         displayName
         datasetNameDelimiter
         logoUrl
+    }
+}
+
+fragment entityContainer on Container {
+    urn
+    platform {
+        ...platformFields
+    }
+    properties {
+        name
+    }
+    subTypes {
+        typeNames
+    }
+}
+
+fragment entityDomain on Domain {
+    urn
+    properties {
+        name
     }
 }
