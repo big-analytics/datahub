@@ -52,7 +52,7 @@ services:
     - ELASTIC_CLIENT_HOST=elasticsearch
     - ELASTIC_CLIENT_PORT=9200
     hostname: datahub-frontend-react
-    image: mnexus001:8082/linkedin/datahub-frontend-react:v0.8.23
+    image: mnexus001:8082/linkedin/datahub-frontend-react:v0.8.26
     ports:
     - 9002:9002
   datahub-gms:
@@ -76,7 +76,7 @@ services:
     - MAE_CONSUMER_ENABLED=true
     - MCE_CONSUMER_ENABLED=true
     hostname: datahub-gms
-    image: mnexus001:8082/linkedin/datahub-gms:v0.8.23
+    image: mnexus001:8082/linkedin/datahub-gms:v0.8.26
     ports:
     - 8080:8080
     volumes:
