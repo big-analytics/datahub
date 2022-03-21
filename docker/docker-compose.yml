@@ -96,7 +96,7 @@ services:
     build:
         context: ../
         dockerfile: docker/datahub-gms/Dockerfile
-    image: mnexus001:8082/linkedin/datahub-gms:v0.8.28
+    image: mnexus001:8082/linkedin/datahub-gms:v0.8.31
     hostname: datahub-gms
     container_name: datahub-gms
     ports:
@@ -111,7 +111,7 @@ services:
     build:
       context: ../
       dockerfile: docker/datahub-frontend/Dockerfile
-    image: mnexus001:8082/linkedin/datahub-frontend-react:v0.8.28
+    image: mnexus001:8082/linkedin/datahub-frontend-react:v0.8.31
     env_file: datahub-frontend/env/docker.env
     hostname: datahub-frontend-react
     container_name: datahub-frontend-react
